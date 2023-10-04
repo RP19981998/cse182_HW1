@@ -72,6 +72,8 @@ class Solver(object):
     """
 
     def __init__(self, model, data, **kwargs):
+        #**kwargs表示将所有未明确指定的关键字参数收集为一个字典，其中关键字是参数的名称，
+        #值是传递给这些参数的值。
         """
         Construct a new Solver instance.
 
@@ -156,6 +158,7 @@ class Solver(object):
         # Make a minibatch of training data
         num_train = self.X_train.shape[0]
         batch_mask = np.random.choice(num_train, self.batch_size)
+        #batch_mask 是一个从训练数据集中随机生成的mini_batch_size索引数组
         X_batch = self.X_train[batch_mask]
         y_batch = self.y_train[batch_mask]
 
@@ -204,7 +207,7 @@ class Solver(object):
             y = y[mask]
 
         # Compute predictions in batches
-        num_batches = N // batch_size
+        num_batches = N // batch_size#整除
         if N % batch_size != 0:
             num_batches += 1
         y_pred = []
@@ -213,7 +216,8 @@ class Solver(object):
             end = (i + 1) * batch_size
             scores = self.model.loss(X[start:end])
             y_pred.append(np.argmax(scores, axis=1))
-        y_pred = np.hstack(y_pred)
+            #axis=1 参数表示沿着列的方向返回每一行的最大值索引，返回的是一个一维数组
+        y_pred = np.hstack(y_pred)#水平堆叠成一个单一的一维数组
         acc = np.mean(y_pred == y)
 
         return acc
@@ -232,7 +236,8 @@ class Solver(object):
             # Maybe print training loss
             if self.verbose and t % self.print_every == 0:
                 print('(Iteration %d / %d) loss: %f' % (t + 1, num_iterations, self.loss_history[-1]))
-
+#接下来的一段代码用于在训练过程中输出训练损失（loss）的信息，
+#以及在每个epoch结束时更新学习率和计算准确率。
             # At the end of every epoch, increment the epoch counter and decay the
             # learning rate.
             epoch_end = (t + 1) % iterations_per_epoch == 0

@@ -59,6 +59,8 @@ def sgd_momentum(w, dw, config=None):
     config.setdefault('learning_rate', 1e-2)
     config.setdefault('momentum', 0.9)
     v = config.get('velocity', np.zeros_like(w))
+    #从配置文件 config 中获取名为 'velocity' 的值，
+    #如果该键不存在或者没有值，则返回一个与数组 w 形状相同的全零数组。
 
     next_w = None
     #############################################################################
@@ -66,7 +68,8 @@ def sgd_momentum(w, dw, config=None):
     # the updated value in the next_w variable. You should also use and update  #
     # the velocity v.                                                           #
     #############################################################################
-    pass
+    v= config['momentum']*v-config['learning_rate']*dw
+    next_w=w+v
     #############################################################################
     #                             END OF YOUR CODE                              #
     #############################################################################
@@ -98,8 +101,13 @@ def rmsprop(x, dx, config=None):
     # TODO: Implement the RMSprop update formula, storing the next value of x   #
     # in the next_x variable. Don't forget to update cache value stored in      #
     # config['cache'] and to use the epsilon scalar to avoid dividing by zero.  #
-    #############################################################################
-    pass
+    ##########################################################################
+    s=config['cache']
+    decay_rate=config['decay_rate']
+    s=decay_rate*s+(1-decay_rate)*dx**2
+    config['cahce']=s
+    
+    next_x=x-config['learning_rate']*dx/(np.sqrt(s)+config['epsilon'])
     #############################################################################
     #                             END OF YOUR CODE                              #
     #############################################################################
@@ -136,7 +144,18 @@ def adam(x, dx, config=None):
     # the next_x variable. Don't forget to update the m, v, and t variables     #
     # stored in config and to use the epsilon scalar to avoid dividing by zero. #
     #############################################################################
-    pass
+    m=config['m']
+    m=(1-config['beta1'])*dx+config['beta1']*m
+    v=config['v']
+    v=(1-config['beta2'])*dx**2+config['beta2']*v
+    config['m']=m
+    config['v']=v
+    t=config['t']+1
+    m=m/(1-config['beta1']**t)
+    v=v/(1-config['beta2']**t)
+    config['t']=t
+    
+    next_x=x-config['learning_rate']*m/(np.sqrt(v)+config['epsilon'])
     #############################################################################
     #                             END OF YOUR CODE                              #
     #############################################################################
